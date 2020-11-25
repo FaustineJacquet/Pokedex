@@ -8,7 +8,8 @@
           <button v-b-modal="'modal'+result.id" v-on:click="getPoke(result.id)" style="margin-bottom: 4vh; margin-top: -3vh;"> Show more about {{result.name}}</button>
           <b-modal 
           :id="'modal'+result.id" 
-          v-bind:title="result.name" 
+          v-if="pokemon"
+          v-bind:title="pokemon.name" 
           >
           <div v-if="pokemon">
 
@@ -120,8 +121,6 @@
         console.log(response)
         this.pokemon=response.note
         if(this.pokemon.evolutions.length !== 0){
-          console.log("evolutions")
-          console.log(this.pokemon.evolutions)
           this.getEvolution(this.pokemon.evolutions.id_pok_evol);
         }
       })

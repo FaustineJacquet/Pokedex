@@ -1,26 +1,34 @@
 <template>
   <div class="hello">
+    <div>
+      <b-dropdown text="Choose a pokemon">
+        <b-dropdown-item>{{}}</b-dropdown-item>
+      </b-dropdown>
+    </div>
+
+    <input type="string" name="search" class="searchbar" placeholder="search a pokemon" v-model="search">
     <div class="container" style="margin-top: 5vh;">
       <div class="row">
-        <div  class="col-2" v-for="(result, index) in results" :key="result+index">
+        <div class="cardpokemons" v-for="(result, index) in getresults()" :key="result+index">
+
           <img style="margin-top: 4vh;" :src="'http://127.0.0.1:8001' +result.image" :title="'image of ' +result.name" height="150vh" wigth="150vw"><br>
           <h2 style="margin-top: 2vh;">{{result.name}}</h2><br>
-          <button v-b-modal="'modal'+result.id" v-on:click="getPoke(result.id)" style="margin-bottom: 4vh; margin-top: -3vh;"> Show more about {{result.name}}</button>
+          <button v-b-modal="'modal'+result.id" v-on:click="getPoke(result.id)" style="margin-bottom: 4vh; margin-top: -3vh;"> Show more <br> about {{result.name}}</button>
           <b-modal 
           :id="'modal'+result.id" 
-          v-if="pokemon"
-          v-bind:title="pokemon.name" 
+          :title="pokemon? pokemon.name : ''"
+          @hide="pokemon=null"
           >
-          <div v-if="pokemon">
 
-            <img style="display: block; margin-left: auto; margin-right: auto;" :src="'http://127.0.0.1:8001' +pokemon.image" :title="'image of ' +pokemon.name"><br>
+          <div v-if="pokemon">
+            <img class="cardpokemons" :src="'http://127.0.0.1:8001' +pokemon.image" :title="'image of ' +pokemon.name" height="300vh" wigth="300vw"><br>
 
             <b-card-group>
               <div class="container">
                 <b-row>
                   <div class="col-6">
                     <b-card>
-                      <h4>Types :</h4>
+                      <h5>Types :</h5>
                       <div>Type 1: {{pokemon.types["type1"]}}</div>
                       <div>Type 2: {{pokemon.types["type2"]}}</div>
                     </b-card>
@@ -28,7 +36,7 @@
 
                   <div class="col-6">
                     <b-card>
-                      <h4 style="margin-top: 3vh;">Stats :</h4>
+                      <h5 style="margin-top: 3vh;">Stats :</h5>
                       <div>hp: {{pokemon.stats["hp"]}}</div>
                       <div>attack: {{pokemon.stats["attack"]}}</div>
                       <div>defense: {{pokemon.stats["defense"]}}</div>
@@ -40,7 +48,7 @@
 
                   <div class="col-6" style="margin-top: 3vh;">
                     <b-card>
-                      <h4 style="margin-top: 3vh;">Weaknesses :</h4>
+                      <h5 style="margin-top: 3vh;">Weaknesses :</h5>
                       <div>Bug: {{pokemon.weaknesses["bug"]}}</div>
                       <div>Dragon: {{pokemon.weaknesses["dragon"]}}</div>
                       <div>Electric: {{pokemon.weaknesses["electric"]}}</div>
@@ -63,7 +71,7 @@
 
                   <div class="col-6" style="margin-top: 3vh;">
                     <b-card v-if="pokemon.evolutions.length !== 0">
-                      <h4 style="margin-top: 3vh;">Evolution :</h4>
+                      <h5 style="margin-top: 3vh;">Evolution :</h5>
                       <div>Id_pok_evolu : {{pokemon.evolutions["id_pok_evol"]}}</div>
                       <div>Lvl_evol_pok : {{pokemon.evolutions["lvl_evol_pok"]}}</div>
                       <div style="margin-top: 6vh; font-weight: bold; font-size: 1rem;">Next evolution :</div>
@@ -75,7 +83,6 @@
                 </b-row>
               </div>
             </b-card-group>
-
           </div>
         </b-modal>
       </div>
@@ -94,6 +101,8 @@
       return{
        results: [], 
        evolutions: [],
+       search: '',
+       drop: [],
        pokemon: null
      } 
    },
@@ -134,7 +143,31 @@
         console.log(response)
         this.evolutions=response.note
       })
-    }
+    },
+    similar(id, name, types){
+      var search = this.search.toLowerCase();
+      id=id.toString().toLowerCase();
+      name=name.toLowerCase();
+      let type1=types.type1.toLowerCase();
+      let type2=types.type2.toLowerCase();
+
+      if(id.includes(search) || name.includes(search) || type1.includes(search) || type2.includes(search)){
+        return true;
+      } 
+      return false;
+    },
+    getresults(){
+      var filteredresults = [];
+      for(var i=0; i<this.results.length; i++){
+        let pokemon = this.results[i];
+        if (this.similar(pokemon.id, pokemon.name, pokemon.types)) {
+          filteredresults.push(pokemon);
+        }
+      }
+      return filteredresults;
+    },
+
+
   }
 }
 </script>
@@ -143,6 +176,9 @@
 <style scoped>
 h3 {
   margin: 40px 0 0;
+}
+h5 {
+  font-weight: bold;
 }
 ul {
   list-style-type: none;
@@ -160,5 +196,13 @@ a {
   margin: auto;
   width: 4em;
   height: 4em;
+}
+.searchbar{
+  margin-top: 4vh;
+  margin-bottom: -2vh;
+}
+.cardpokemons{
+ display: block;
+ margin: auto;
 }
 </style>

@@ -73,11 +73,8 @@
        pokemon: null,
      } 
    },
-   mounted(){
-    this.getPoke()
-  },
-  methods:
-  {
+   methods:
+   {
     getPoke(id){
       fetch('http://127.0.0.1:8001/pokemon/'+id, {
         method: "GET"

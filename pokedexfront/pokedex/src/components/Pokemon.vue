@@ -1,5 +1,6 @@
 <template>
   <div>
+
     <div>
       <b-dropdown variant="light" style="margin-top: 3vh; border: solid 1px" :text="type">
         <b-dropdown-item @click="setType('type')">all</b-dropdown-item>
@@ -7,9 +8,13 @@
       </b-dropdown>
     </div>
 
+    <b-navbar fixed="bottom" v-if="isDown()">
+      <b-button variant="light" style="font-size: 1.5vw; border: solid 1px;" @click="scrollToTop()">Go to top</b-button>
+    </b-navbar>
+
     <input type="string" name="search" class="searchbar" placeholder="search a pokemon" v-model="search">
     <img src="../assets/ball.jpg" height="100vh" wigth="100vw" style="margin-bottom: 3vh; margin-left: 2vw;">
-    
+
     <div class="container" style="margin-top: 5vh;">
       <div class="row">
         <div class="cardpokemons" v-for="(result, index) in getresults()" :key="result+index">
@@ -39,14 +44,34 @@
        results: [], 
        search: '',
        types: [],
-       type: 'type'
+       type: 'type',
+       scrollY: 0
      } 
    },
-   mounted(){
+   created(){
+    window.addEventListener('scroll', this.scrollPosition)
+  },
+  destroyed(){
+    window.removeEventListener('scroll', this.scrollPosition)
+  },
+  mounted(){
     this.getPokemon()
   },
   methods:
   {
+    isDown(){
+      return this.scrollY > window.innerHeight
+    },
+    scrollPosition(){
+      this.scrollY = window.scrollY
+    },
+    scrollToTop() {
+      window.scrollTo({
+        top:0,
+        left:0,
+        behavior: 'smooth'
+      })
+    },
     getPokemon(){
       fetch('http://127.0.0.1:8001/', {
         method: "GET"

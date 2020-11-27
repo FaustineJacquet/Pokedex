@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/pokemon.png">
-    <HelloWorld msg="Show your pokedex"/>
+    <HelloWorld/>
   </div>
 </template>
 
